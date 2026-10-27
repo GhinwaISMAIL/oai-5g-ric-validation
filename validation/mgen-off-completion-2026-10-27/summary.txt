@@ -1,0 +1,15 @@
+UTC: 2026-10-27T14:01:57Z
+Architecture: x86_64
+26131fb2203d1c9ec8d7a0891094846ac5255de563d72368b36665b4fc0809b7  /repo/bin/mgen
+mgen: version 5.02b
+mgen: starting now ...
+mgen: version 5.02b
+mgen: starting now ...
+duration=1 sender_rc=0 expected=10 sent=10 unique=10 off=1 stop=1
+mgen: version 5.02b
+mgen: starting now ...
+duration=5 sender_rc=0 expected=50 sent=50 unique=50 off=1 stop=1
+Receiver wrapper exit: 0
+flow=1 expected=10 received=10
+flow=5 expected=50 received=50
+PASS: both OFF-only senders exited cleanly with exact loopback packet counts

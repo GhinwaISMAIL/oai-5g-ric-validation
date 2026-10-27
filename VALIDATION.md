@@ -77,11 +77,15 @@ that an arbitrary replay schedule completed either. The current tools do not
 validate that schedule automatically.
 
 The [MGEN reference](https://github.com/USNavalResearchLaboratory/mgen/blob/master/doc/mgen.html)
-describes OFF, SEND, and process STOP as distinct events. Live validation must
-check how the bundled binary terminates after the generated OFF-only scripts;
-those scripts may now fail until clean completion or schedule evidence is
-established. No unchecked timeout exception is provided for synthetic campaigns
-or arbitrary script replay.
+describes OFF, SEND, and process STOP as distinct events. The bundled MGEN 5.02b
+binary was tested locally on 27 October 2026: both one- and five-second OFF-only
+flows exited cleanly (0), logged OFF and STOP, and delivered exact counts of 10
+and 50 packets over isolated loopback. See the [raw compatibility evidence](validation/mgen-off-completion-2026-10-27/README.md)
+and `tests/integration/mgen-off-completion.sh` for reproduction. This is a local
+Linux-container compatibility result, not distributed POWDER validation or proof
+of arbitrary replay completion. Recheck the deployed binary hash and actual logs
+when validating the reservation. No unchecked timeout exception is provided for
+synthetic campaigns or arbitrary script replay.
 
 After receivers stop, collect each isolated sender/receiver pair and both
 sidecars onto one machine, then run:

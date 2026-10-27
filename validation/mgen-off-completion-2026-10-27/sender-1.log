@@ -1,0 +1,14 @@
+14:01:58.515357 START Mgen Version 5.02b
+14:01:58.517718 ON flow>1 srcPort>0 dst>127.0.0.1/5000 
+14:01:58.518599 SEND proto>UDP flow>1 seq>0 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:58.623424 SEND proto>UDP flow>1 seq>1 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:58.723472 SEND proto>UDP flow>1 seq>2 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:58.820934 SEND proto>UDP flow>1 seq>3 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:58.923031 SEND proto>UDP flow>1 seq>4 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:59.019329 SEND proto>UDP flow>1 seq>5 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:59.123494 SEND proto>UDP flow>1 seq>6 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:59.219918 SEND proto>UDP flow>1 seq>7 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:59.323535 SEND proto>UDP flow>1 seq>8 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:59.420724 SEND proto>UDP flow>1 seq>9 srcPort>46811 dst>127.0.0.1/5000 size>1000 
+14:01:59.522268 OFF flow>1 srcPort>46811 dst>127.0.0.1/5000 
+14:01:59.522984 STOP

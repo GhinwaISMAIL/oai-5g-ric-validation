@@ -1,0 +1,2 @@
+# Preserve native whitespace in recorded packet-log evidence.
+validation/mgen-off-completion-2026-10-27/*.log -whitespace

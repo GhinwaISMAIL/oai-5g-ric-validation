@@ -19,6 +19,8 @@ Usage:
 The external-DN container stores logs under /logs/mgen, bind-mounted from
 /local/logs/mgen on the core host.
   sudo bash bin/mgen-core.sh run-script RUN_ID SCRIPT DURATION tx|rx
+
+MGEN_DRAIN_SECONDS controls extra receiver lifetime (default: 15 seconds).
 EOF
 }
 
@@ -53,6 +55,11 @@ ul_base() {
     printf '%s/%s-ul-cell%s-ue%s' "$LOG_DIR" "$1" "$2" "$3"
 }
 
+# Extra receiver lifetime after the nominal schedule, in wall-clock seconds.
+DRAIN_SECONDS=${MGEN_DRAIN_SECONDS:-15}
+require_uint MGEN_DRAIN_SECONDS "$DRAIN_SECONDS"
+DRAIN_SECONDS=$((10#$DRAIN_SECONDS))
+
 case "${1:-}" in
 check)
     for container in "$DN_C" "$UPF_C"; do
@@ -84,7 +91,7 @@ listen-ul)
     docker exec "$DN_C" bash -lc \
         "mkdir -p '$LOG_DIR'; printf '0.0 LISTEN UDP %s\\n' '$PORT' > '$CFG'; : > '$LOG'"
     docker exec -d "$DN_C" bash -lc \
-        "timeout '$((DURATION + 5))' /usr/bin/mgen input '$CFG' output '$LOG'"
+        "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '$CFG' output '$LOG'"
     echo "OK: uplink receiver armed on UDP $PORT; log=$LOG"
     ;;
 
@@ -138,7 +145,7 @@ run-script)
     docker exec "$DN_C" test -f "$CFG" || die "$DN_C is missing $CFG"
     if [ "$MODE" = rx ]; then
         docker exec -d "$DN_C" bash -lc \
-            "timeout '$((DURATION + 15))' /usr/bin/mgen input '$CFG' output '$LOG'"
+            "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '$CFG' output '$LOG'"
         echo "OK: receiver armed from $SCRIPT; log=$LOG"
     else
         docker exec "$DN_C" bash -lc \

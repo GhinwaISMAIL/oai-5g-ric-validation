@@ -1,4 +1,4 @@
-# oai-5g-ric
+# oai-5g-ric-validation
 
 Multi-cell OAI 5G SA testbed on POWDER, with a FlexRIC near-RT RIC and per-UE radio
 channel modelling. The RAN is simulated at the PHY layer (RFsim) with a configurable
@@ -71,7 +71,8 @@ file is unbounded and was observed to grow to 50 GB, fill the core filesystem,
 and make SQLite fail inside `insert_db`. The normal RIC process log remains at
 `/local/logs/nearRT-RIC.log`, and bounded xApp logs remain under `/local/logs`.
 
-`BUILD.md` documents how the images are built and the constraints that apply.
+`BUILD.md` records the known build constraints and missing image provenance.
+See [VALIDATION.md](VALIDATION.md) for receiver timing and controlled experiments.
 
 ## Instantiating
 
@@ -185,8 +186,8 @@ downlink channel is applied UE-side:
 
 ```
 telnet <ue> 9090
-  channelmod show current              # model 0 = uplink, 1..K = per-UE downlink
-  channelmod modify 1 noise_power_dB 30
+  channelmod show current              # model 0 is the active downlink in this UE
+  channelmod modify 0 noise_power_dB -25
 ```
 
 Parameters: `riceanf`, `aoa`, `randaoa`, `ploss`, `noise_power_dB`, `offset`,
@@ -197,14 +198,13 @@ experiments, use `bin/channel-cell.py` on the cell node instead of driving an
 interactive telnet session. It verifies every value after applying it:
 
 ```bash
-# Per-UE downlink model (UE2 uses channel model index 2)
+# Per-UE downlink: select UE2; its active model index is 0
 sudo python3 bin/channel-cell.py set --cell 1 --direction dl --ue 2 \
   --parameter ploss --value 12
-
-# Cell-wide uplink model (the current RFsim topology has one UL model per cell)
-sudo python3 bin/channel-cell.py set --cell 1 --direction ul \
-  --parameter noise_power_dB --value -25
 ```
+
+Runtime uplink modification is disabled because connection-to-model identity is
+not stable. The helper rejects `--direction ul`.
 
 Channel family/type remains a boot-time setting. Runtime schedules may change
 `ploss`, `noise_power_dB`, `riceanf`, `aoa`, `offset`, and `forgetf` after UEs

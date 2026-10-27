@@ -17,6 +17,8 @@ Usage:
   sudo bash bin/mgen-cell.sh listen-dl RUN_ID CELL UE PORT DURATION
   sudo bash bin/mgen-cell.sh count-dl RUN_ID CELL UE
   sudo bash bin/mgen-cell.sh run-script RUN_ID CELL UE SCRIPT DURATION tx|rx
+
+MGEN_DRAIN_SECONDS controls extra receiver lifetime (default: 15 seconds).
 EOF
 }
 
@@ -63,6 +65,11 @@ ensure_ready() {
     grep -q 'dev oaitun_ue1' <<<"$route" || die "$container routes the DN outside oaitun_ue1"
     printf '%s' "$ip"
 }
+
+# Extra receiver lifetime after the nominal schedule, in wall-clock seconds.
+DRAIN_SECONDS=${MGEN_DRAIN_SECONDS:-15}
+require_uint MGEN_DRAIN_SECONDS "$DRAIN_SECONDS"
+DRAIN_SECONDS=$((10#$DRAIN_SECONDS))
 
 case "${1:-}" in
 check)
@@ -132,7 +139,7 @@ listen-dl)
     docker exec "$C" bash -lc \
         "mkdir -p '$LOG_DIR_CONTAINER'; printf '0.0 LISTEN UDP %s\\n' '$PORT' > '${BASE}.mgn'; : > '${BASE}.log'"
     docker exec -d "$C" bash -lc \
-        "timeout '$((DURATION + 5))' /usr/bin/mgen input '${BASE}.mgn' output '${BASE}.log'"
+        "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '${BASE}.mgn' output '${BASE}.log'"
     echo "UE_IP=$IP"
     ;;
 
@@ -171,7 +178,7 @@ run-script)
         RX0=$(docker exec "$C" cat /sys/class/net/oaitun_ue1/statistics/rx_packets)
         printf '%s\n' "$RX0" > "$LOG_DIR_HOST/$RUN_ID-cell${CELL}-ue${UE}.rx0"
         docker exec -d "$C" bash -lc \
-            "timeout '$((DURATION + 15))' /usr/bin/mgen input '$CFG' output '$LOG'"
+            "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '$CFG' output '$LOG'"
         echo "UE_IP=$IP RX0=$RX0"
     else
         TX0=$(docker exec "$C" cat /sys/class/net/oaitun_ue1/statistics/tx_packets)

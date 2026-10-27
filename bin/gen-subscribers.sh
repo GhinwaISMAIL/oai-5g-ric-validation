@@ -58,7 +58,7 @@ sed '/-- BEGIN GENERATED SUBSCRIBERS/,/-- END GENERATED SUBSCRIBERS/d' \
 INSERT INTO \`AuthenticationSubscription\` (\`ueid\`, \`authenticationMethod\`, \`encPermanentKey\`, \`protectionParameterId\`, \`sequenceNumber\`, \`authenticationManagementField\`, \`algorithmId\`, \`encOpcKey\`, \`encTopcKey\`, \`vectorGenerationInHss\`, \`n5gcAuthMethod\`, \`rgAuthenticationInd\`, \`supi\`) VALUES
 ('${IMSI}', '5G_AKA', '${KEY}', '${KEY}', '{"sqn": "000000000020", "sqnScheme": "NON_TIME_BASED", "lastIndexes": {"ausf": 0}}', '8000', 'milenage', '${OPC}', NULL, NULL, NULL, NULL, '${IMSI}');
 INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
-('${IMSI}', '${PLMN}', '{\\"sst\\": 1, \\"sd\\": \\"16777215\\"}', '{\\"oai\\":{\\"pduSessionTypes\\":{\\"defaultSessionType\\": \\"IPV4\\"},\\"sscModes\\":{\\"defaultSscMode\\": \\"SSC_MODE_1\\"},\\"5gQosProfile\\":{\\"5qi\\": 6,\\"arp\\":{\\"priorityLevel\\": 1,\\"preemptCap\\": \\"NOT_PREEMPT\\",\\"preemptVuln\\":\\"PREEMPTABLE\\"},\\"priorityLevel\\":1},\\"sessionAmbr\\":{\\"uplink\\":\\"1000Mbps\\",\\"downlink\\":\\"1000Mbps\\"}}}');
+('${IMSI}', '${PLMN}', '{\\"sst\\": 1, \\"sd\\": \\"16777215\\"}', '{\\"oai\\":{\\"pduSessionTypes\\":{\\"defaultSessionType\\": \\"IPV4\\"},\\"sscModes\\":{\\"defaultSscMode\\": \\"SSC_MODE_1\\"},\\"5gQosProfile\\":{\\"5qi\\": 9,\\"arp\\":{\\"priorityLevel\\": 1,\\"preemptCap\\": \\"NOT_PREEMPT\\",\\"preemptVuln\\":\\"PREEMPTABLE\\"},\\"priorityLevel\\":1},\\"sessionAmbr\\":{\\"uplink\\":\\"200Mbps\\",\\"downlink\\":\\"400Mbps\\"}}}');
 SQLEOF
   done
 

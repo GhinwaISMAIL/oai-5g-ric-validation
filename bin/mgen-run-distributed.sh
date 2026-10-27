@@ -14,7 +14,7 @@ Examples:
   bash bin/mgen-run-distributed.sh ghinwa@pc816.emulab.net ghinwa@pc03-meb.emulab.net 1 all quick
 
 Optional environment variables:
-  UES_PER_CELL=12  RATE=10  SIZE=1000  DURATION=5  WARMUP=2
+  UES_PER_CELL=12  RATE=10  SIZE=1000  DURATION=5  WARMUP=2  MGEN_DRAIN_SECONDS=15
 
 RATE is packets/second and SIZE is bytes/packet. The defaults generate about
 80 kbit/s per active flow and are intended as a safe preflight load.
@@ -34,13 +34,16 @@ RATE=${RATE:-10}
 SIZE=${SIZE:-1000}
 DURATION=${DURATION:-5}
 WARMUP=${WARMUP:-2}
+DRAIN_SECONDS=${MGEN_DRAIN_SECONDS:-15}
 RUN_ID="mgen-$(date +%Y%m%d-%H%M%S)-cell${CELL}"
 EXPECT=$((RATE * DURATION))
 PASS_MIN=$((EXPECT * 7 / 10))
 
-for value in "$CELL" "$UES_PER_CELL" "$RATE" "$SIZE" "$DURATION" "$WARMUP"; do
+for value in "$CELL" "$UES_PER_CELL" "$RATE" "$SIZE" "$DURATION" "$WARMUP" "$DRAIN_SECONDS"; do
     [[ "$value" =~ ^[0-9]+$ ]] || { echo "ERROR: numeric argument expected: $value" >&2; exit 2; }
 done
+DRAIN_SECONDS=$((10#$DRAIN_SECONDS))
+RECEIVER_DURATION=$((DURATION + WARMUP + 15))
 case "$MODE" in quick|full) ;; *) usage; exit 2 ;; esac
 if [ "$UE_SPEC" = all ]; then
     UES=$(seq 1 "$UES_PER_CELL")
@@ -54,11 +57,11 @@ fi
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=15)
 core() {
     ssh "${SSH_OPTS[@]}" "$CORE_HOST" \
-        sudo bash /local/repository/bin/mgen-core.sh "$@"
+        sudo env MGEN_DRAIN_SECONDS="$DRAIN_SECONDS" bash /local/repository/bin/mgen-core.sh "$@"
 }
 cell() {
     ssh "${SSH_OPTS[@]}" "$CELL_HOST" \
-        sudo bash /local/repository/bin/mgen-cell.sh "$@"
+        sudo env MGEN_DRAIN_SECONDS="$DRAIN_SECONDS" bash /local/repository/bin/mgen-cell.sh "$@"
 }
 value_from() {
     local key=$1 text=$2
@@ -86,23 +89,23 @@ for UE in $UES; do
     echo
     echo "=== cell${CELL}/UE${UE} ==="
 
-    core listen-ul "$RUN_ID" "$CELL" "$UE" "$UL_PORT" "$DURATION"
+    core listen-ul "$RUN_ID" "$CELL" "$UE" "$UL_PORT" "$RECEIVER_DURATION"
     sleep "$WARMUP"
     UL_TX=$(cell send-ul "$RUN_ID" "$CELL" "$UE" "$UL_PORT" "$RATE" "$SIZE" "$DURATION")
     echo "$UL_TX"
     UE_IP=$(value_from UE_IP "$UL_TX")
     TX_DELTA=$(value_from TX_DELTA "$UL_TX")
-    sleep 1
+    sleep "$DRAIN_SECONDS"
     UL_RX=$(core count-ul "$RUN_ID" "$CELL" "$UE")
     echo "$UL_RX"
     UL_RECV=$(value_from UL_RECV "$UL_RX")
 
-    DL_READY=$(cell listen-dl "$RUN_ID" "$CELL" "$UE" "$DL_PORT" "$DURATION")
+    DL_READY=$(cell listen-dl "$RUN_ID" "$CELL" "$UE" "$DL_PORT" "$RECEIVER_DURATION")
     echo "$DL_READY"
     [ -n "$UE_IP" ] || UE_IP=$(value_from UE_IP "$DL_READY")
     sleep "$WARMUP"
     core send-dl "$RUN_ID" "$CELL" "$UE" "$UE_IP" "$DL_PORT" "$RATE" "$SIZE" "$DURATION"
-    sleep 1
+    sleep "$DRAIN_SECONDS"
     DL_RX=$(cell count-dl "$RUN_ID" "$CELL" "$UE")
     echo "$DL_RX"
     DL_RECV=$(value_from DL_RECV "$DL_RX")

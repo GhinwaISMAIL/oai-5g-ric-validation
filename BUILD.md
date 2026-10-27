@@ -1,9 +1,11 @@
 # Image build provenance
 
 The profile currently uses `ghinwa555/oai-gnb-e2-chan:v2` and
-`ghinwa555/oai-nr-ue-chan:v2`. Their Dockerfiles, source revisions, patch sets,
-and complete build commands are not recorded here. An exact rebuild is therefore
-not currently reproducible. Do not infer the gNB source from the core checkout.
+`ghinwa555/oai-nr-ue-chan:v2`. Their original Dockerfiles, local patch sets,
+and complete build commands are not recorded here. Binary inspection now identifies
+a reported source revision for the mobility candidates (see below), but an exact
+rebuild remains unreproducible. Do not infer the gNB source from the core checkout
+alone.
 
 The core setup pins OAI `70508ebaf52f2aae420566d380c6537f2efb9f0c`
 and FlexRIC `ef6d722f22191eea74089966983da1f5ec1fedd4` for the host RIC build.
@@ -20,3 +22,15 @@ revisions, patches, build flags, compiler versions, and resulting registry diges
 Include `org.opencontainers.image.revision` and `org.opencontainers.image.source`
 labels. Pin verified image digests only after testing attachment, E2 indications,
 and per-UE channel read-back. Never invent a revision or digest for existing images.
+
+## Radio artifact inspection
+
+The mobility branch includes a registry and binary inspection of the current
+candidate radio images. Both executables embed version `70508ebaf5`, resolving to
+the full pinned OAI revision above. The RFsim library bytes match, and the gNB CI
+library contains the N2 trigger marker. These findings narrow the provenance gap;
+they do not recover the complete build recipes or undocumented patches, or
+identify what a running reservation uses. See
+[the compatibility assessment](experiments/n2-handover/COMPATIBILITY.md).
+Only the separate mobility topology uses the inspected immutable digest references;
+the baseline image references and build behavior remain unchanged.

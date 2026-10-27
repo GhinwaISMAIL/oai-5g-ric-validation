@@ -1,0 +1,63 @@
+{
+  "SLSA": {
+    "buildDefinition": {
+      "buildType": "https://github.com/moby/buildkit/blob/master/docs/attestations/slsa-definitions.md",
+      "externalParameters": {
+        "configSource": {
+          "path": "Dockerfile.nrUE.ubuntu"
+        },
+        "request": {
+          "compatibilityVersion": 30,
+          "frontend": "dockerfile.v0",
+          "locals": [
+            {
+              "name": "context"
+            },
+            {
+              "name": "dockerfile"
+            }
+          ]
+        }
+      },
+      "internalParameters": {
+        "builderPlatform": "linux/amd64",
+        "dockerfileVersion": "1.25.0"
+      },
+      "resolvedDependencies": [
+        {
+          "digest": {
+            "sha256": "03e3dc89a9677101e8b2b530d5087926d05d9ef07636912e92155793f112dc6a"
+          },
+          "uri": "pkg:docker/ran-base@latest?platform=linux%2Famd64"
+        },
+        {
+          "digest": {
+            "sha256": "4fb11140c218ddba063a8aef3272af39fbf19c3a4e800eecca44084539b0bc9e"
+          },
+          "uri": "pkg:docker/ran-build@latest?platform=linux%2Famd64"
+        },
+        {
+          "digest": {
+            "sha256": "4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90"
+          },
+          "uri": "pkg:docker/ubuntu@noble?platform=linux%2Famd64"
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": ""
+      },
+      "metadata": {
+        "buildkit_completeness": {
+          "request": true,
+          "resolvedDependencies": false
+        },
+        "buildkit_metadata": {},
+        "finishedOn": "2026-07-14T06:31:53.818523306-06:00",
+        "invocationId": "kiagynauv226hqyi323tav9p7",
+        "startedOn": "2026-07-14T06:31:52.649022718-06:00"
+      }
+    }
+  }
+}

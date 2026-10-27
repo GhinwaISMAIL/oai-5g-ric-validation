@@ -1,0 +1,9 @@
+{
+  "core_lan_ip": "10.10.1.1",
+  "source_lan_ip": "10.10.1.11",
+  "target_lan_ip": "10.10.1.12",
+  "amf_ip": "192.168.71.132",
+  "imsi": "208990100001100",
+  "gnb_image": "ghinwa555/oai-gnb-e2-chan@sha256:1bc3c341b498fdc2096721bd0b86f5bdd3ca985a930617163c611db5a9bc5501",
+  "ue_image": "ghinwa555/oai-nr-ue-chan@sha256:f00af9714f0e953c79d8e4def6b71d15d9af2c504bca1e0a8db2edbb59d6fb60"
+}

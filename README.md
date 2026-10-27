@@ -289,3 +289,10 @@ etc/gnb-cell.conf.tmpl   gNB template: E2 agent, channel model, per-cell identit
 etc/nr-ue.conf.tmpl      UE template
 Dockerfile.flexric       reference build for a containerised RIC (see BUILD.md)
 ```
+
+## Experimental mobility prototype
+
+A separate, preparation-only two-cell/one-UE N2 handover layout is described in
+[experiments/n2-handover/README.md](experiments/n2-handover/README.md).
+`profile-handover.py` reserves three hosts without starting software.
+The existing profile and setup remain the isolated-cell baseline.

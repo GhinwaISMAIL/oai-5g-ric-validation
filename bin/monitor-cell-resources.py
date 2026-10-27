@@ -78,7 +78,8 @@ def sample(containers, radio_log):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-id', required=True)
-    parser.add_argument('--instantiated-ues', type=int, required=True)
+    parser.add_argument('--instantiated-ues', type=int, required=True,
+                        help='UE processes on this host; a target gNB host may have zero')
     parser.add_argument('--monitoring', required=True, help='Label including xApp/reporting interval')
     parser.add_argument('--duration', type=float, default=60)
     parser.add_argument('--interval', type=float, default=10)
@@ -86,8 +87,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='New JSONL file; never overwritten')
     args = parser.parse_args()
     if (not math.isfinite(args.interval) or args.interval < 2 or
-            not math.isfinite(args.duration) or args.duration <= 0 or args.instantiated_ues < 1):
-        parser.error('interval must be >= 2 seconds; duration and instantiated UEs must be positive')
+            not math.isfinite(args.duration) or args.duration <= 0 or args.instantiated_ues < 0):
+        parser.error('interval must be >= 2 seconds; duration must be positive and instantiated UEs nonnegative')
     if not Path('/proc/stat').exists():
         parser.error('run this collector on the Linux cell node')
     containers = [name for name in command('docker', 'ps', '--format', '{{.Names}}').splitlines()

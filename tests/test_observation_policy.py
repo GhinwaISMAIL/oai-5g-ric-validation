@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import os
 from pathlib import Path
 import shutil
@@ -242,3 +243,20 @@ def test_report_distinguishes_sender_deadline_from_receiver_timeout(
         ], capture_output=True, text=True)
         assert cli.returncode == 1
         assert 'sender_deadline_exceeded' in cli.stdout
+
+
+def test_resource_monitor_accepts_target_host_without_local_ues(tmp_path, monkeypatch):
+    output = tmp_path / 'target.jsonl'
+    monkeypatch.setattr(sys, 'argv', ['monitor', '--run-id', 'target', '--monitoring', 'no-xapp',
+                                      '--instantiated-ues', '0', '--duration', '0.01',
+                                      '--output', str(output)])
+    original_exists = Path.exists
+    monkeypatch.setattr(Path, 'exists', lambda path: True if str(path) == '/proc/stat' else original_exists(path))
+    monkeypatch.setattr(MONITOR, 'command', lambda *args: 'ric5g-gnb-cell2')
+    monkeypatch.setattr(MONITOR, 'cpu_ticks', lambda: {'cpu0': [0] * 8})
+    monkeypatch.setattr(MONITOR, 'sample', lambda *args: {'container_stats': [], 'errors': []})
+    MONITOR.main()
+    records = [json.loads(line) for line in output.read_text().splitlines()]
+    assert records[0]['instantiated_ues_declared'] == 0
+    assert records[0]['container_names'] == ['ric5g-gnb-cell2']
+    assert records[-1]['event'] == 'stop'

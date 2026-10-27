@@ -1,0 +1,9 @@
+{
+  "core_lan_ip": "10.10.1.1",
+  "source_lan_ip": "10.10.1.11",
+  "target_lan_ip": "10.10.1.12",
+  "amf_ip": "192.168.71.132",
+  "imsi": "208990100001100",
+  "gnb_image": "ghinwa555/oai-gnb-e2-chan:v2",
+  "ue_image": "ghinwa555/oai-nr-ue-chan:v2"
+}

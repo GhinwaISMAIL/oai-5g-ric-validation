@@ -13,7 +13,11 @@ mgen_observe() {
         timeout --kill-after=5 "$limit" "$executable" input "$cfg" output "$log" || rc=$?
     fi
     printf 'stop\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date +%s)" "$role" "$rc" >> "$lifecycle" || return
-    [ "$rc" -eq 0 ] || [ "$rc" -eq 124 ]
+    if [ "$role" = tx ] && [ "$rc" -eq 124 ]; then
+        echo "ERROR: sender deadline exceeded; traffic schedule completion is unverified: $log" >&2
+        return 124
+    fi
+    [ "$rc" -eq 0 ] || { [ "$role" = rx ] && [ "$rc" -eq 124 ]; }
 }
 
 mgen_launch() {

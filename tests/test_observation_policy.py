@@ -80,7 +80,7 @@ def test_reconciliation_preserves_censoring_and_requires_clock_evidence(tmp_path
     tx, rx = tmp_path / 'tx.log', tmp_path / 'rx.log'
     tx.write_text('10 SEND flow>1 seq>1\n11 SEND flow>1 seq>2\n')
     rx.write_text('12 RECV flow>1 seq>1\n')
-    lifecycle(tx, 'tx', 100, 110)
+    lifecycle(tx, 'tx', 100, 110, 0)
     lifecycle(rx, 'rx', 99, 711)
     result = REPORT.report(tx, rx, 600)
     assert result['process_window_status'] == 'clock_alignment_unverified'
@@ -140,8 +140,10 @@ from pathlib import Path
 import sys, time
 cfg = Path(sys.argv[sys.argv.index('input') + 1])
 log = Path(sys.argv[sys.argv.index('output') + 1])
-if cfg.read_text() == 'tx':
+if cfg.read_text().startswith('tx'):
     log.write_text(str(time.time()) + ' SEND flow>1 seq>1\\n')
+    if cfg.read_text() == 'tx-timeout':
+        time.sleep(10)
 else:
     time.sleep(0.8)
     log.write_text(str(time.time()) + ' RECV flow>1 seq>1\\n')
@@ -174,3 +176,69 @@ else:
         if receiver.poll() is None:
             receiver.terminate()
             receiver.wait(timeout=5)
+
+
+    # A real sender process that emitted a packet but stays alive must fail at
+    # its deadline, independently of the receiver's successful planned timeout.
+    cfg.write_text('tx-timeout')
+    timed_sender = launch('tx', 1, cfg, tx)
+    try:
+        assert timed_sender.wait(timeout=6) == 124
+        assert REPORT.lifecycle(tx)['stop']['exit_code'] == '124'
+        assert 'SEND flow>1 seq>1' in tx.read_text()
+    finally:
+        if timed_sender.poll() is None:
+            timed_sender.terminate()
+            timed_sender.wait(timeout=5)
+
+
+@pytest.mark.parametrize('role, code, expected', [
+    ('tx', 0, 0), ('tx', 124, 124), ('tx', 1, 1), ('tx', 137, 1),
+    ('rx', 0, 0), ('rx', 124, 0), ('rx', 1, 1), ('rx', 137, 1),
+])
+def test_wrapper_accepts_timeout_only_for_receiver(tmp_path, role, code, expected):
+    timeout = tmp_path / 'timeout'
+    timeout.write_text(f'#!/bin/bash\nexit {code}\n')
+    timeout.chmod(0o755)
+    log = tmp_path / 'process.log'
+    result = subprocess.run([
+        'bash', '-c', 'source "$1"; mgen_observe "$2" 1 unused "$3"', '_',
+        str(ROOT / 'bin/mgen-lifecycle.sh'), role, str(log),
+    ], env=dict(os.environ, PATH=f'{tmp_path}:' + os.environ['PATH']),
+        capture_output=True, text=True)
+    assert result.returncode == expected
+    assert REPORT.lifecycle(log)['stop']['exit_code'] == str(code)
+    if role == 'tx' and code == 124:
+        assert 'sender deadline exceeded' in result.stderr
+
+
+@pytest.mark.parametrize('sender_rc, receiver_rc, status', [
+    (0, 0, 'bounded_process_window_observed'),
+    (0, 124, 'bounded_process_window_observed'),
+    (124, 0, 'sender_deadline_exceeded'),
+    (124, 124, 'sender_deadline_exceeded'),
+    (1, 124, 'process_failure'),
+    (137, 124, 'process_failure'),
+    (0, 1, 'process_failure'),
+    (0, 137, 'process_failure'),
+])
+def test_report_distinguishes_sender_deadline_from_receiver_timeout(
+        tmp_path, sender_rc, receiver_rc, status):
+    tx, rx = tmp_path / 'tx.log', tmp_path / 'rx.log'
+    # Even complete delivery and a final OFF cannot turn an unverified sender
+    # deadline exit into a successful traffic schedule.
+    tx.write_text('10 SEND flow>1 seq>1\n11 OFF flow>1\n')
+    rx.write_text('12 RECV flow>1 seq>1\n')
+    lifecycle(tx, 'tx', 100, 110, sender_rc)
+    lifecycle(rx, 'rx', 99, 711, receiver_rc)
+    result = REPORT.report(tx, rx, 600, True)
+    assert result['process_window_status'] == status
+    assert result['unique_received_matching_sent'] == 1
+    if sender_rc == 124:
+        cli = subprocess.run([
+            sys.executable, str(ROOT / 'bin/mgen-observation-report.py'),
+            '--tx', str(tx), '--rx', str(rx), '--drain-seconds', '600',
+            '--clocks-synchronized',
+        ], capture_output=True, text=True)
+        assert cli.returncode == 1
+        assert 'sender_deadline_exceeded' in cli.stdout

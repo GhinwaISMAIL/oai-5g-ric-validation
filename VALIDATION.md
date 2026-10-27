@@ -59,10 +59,29 @@ readiness; verify LISTEN/traffic reception on the separate test reservation.
 Lifecycle times bracket execution, not the exact final SEND or socket activation.
 A detached receiver can still exit after an aliveness check. Inspect its final
 stop record after natural shutdown; a missing stop record invalidates lifecycle
-validation. Exit code 124 denotes the planned timeout; other nonzero codes are
-process failures. Timeout has a five-second forced-kill fallback. Unexpected
+validation. Exit code 124 is accepted only for a receiver's planned timeout.
+A sender deadline exit (124) fails the helper and is reported as
+`sender_deadline_exceeded` by reconciliation. Other nonzero sender exits and
+receiver exits other than 124 are process failures. Timeout has a five-second
+forced-kill fallback. Unexpected
 process/container termination may prevent a stop record from being written.
 Use unique run/script names; rerunning a name overwrites that run's artifacts.
+
+The sender rule deliberately fails closed. An OFF event stops a flow; it does not
+by itself prove that the intended packet count was sent or that MGEN exited.
+A sender that sends its traffic and then idles until its deadline will also fail.
+Do not bypass this by treating 124 as success. Before any future exception, verify
+the intended schedule, final OFF/SEND events, and exact offered packet counts
+against the actual deployed MGEN logs. A clean process exit alone is not proof
+that an arbitrary replay schedule completed either. The current tools do not
+validate that schedule automatically.
+
+The [MGEN reference](https://github.com/USNavalResearchLaboratory/mgen/blob/master/doc/mgen.html)
+describes OFF, SEND, and process STOP as distinct events. Live validation must
+check how the bundled binary terminates after the generated OFF-only scripts;
+those scripts may now fail until clean completion or schedule evidence is
+established. No unchecked timeout exception is provided for synthetic campaigns
+or arbitrary script replay.
 
 After receivers stop, collect each isolated sender/receiver pair and both
 sidecars onto one machine, then run:

@@ -49,7 +49,11 @@ def report(tx, rx, drain, synchronized=False):
     if complete:
         roles_valid = all(item['start']['role'] == role and item['stop']['role'] == role
                           for item, role in ((sender, 'tx'), (receiver, 'rx')))
-        if not roles_valid or any(item['stop']['exit_code'] not in ('0', '124') for item in (sender, receiver)):
+        if not roles_valid:
+            status = 'process_failure'
+        elif sender['stop']['exit_code'] == '124':
+            status = 'sender_deadline_exceeded'
+        elif sender['stop']['exit_code'] != '0' or receiver['stop']['exit_code'] not in ('0', '124'):
             status = 'process_failure'
         elif tx_unparsed or rx_unparsed or tx_duplicates or received - sent or not sent:
             status = 'invalid_or_ambiguous_packet_logs'

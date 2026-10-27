@@ -1,0 +1,108 @@
+{
+  "role": "ue",
+  "inspection": "static_only_no_radio_started",
+  "files": [
+    {
+      "path": "/opt/oai-nr-ue/bin/nr-uesoftmodem",
+      "exists": true,
+      "sha256": "2d817439d5980f44d2b3483f330962af2bf2a9ccdd15d207add2227f3f48a4e3",
+      "size": 47617288,
+      "markers": {
+        "trigger_n2_ho": false,
+        "trigger_f1_ho": false,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": true,
+        "reconfigurationWithSync": true,
+        "serveraddr": false,
+        "serverport": false
+      },
+      "revision_candidates": [],
+      "version_context": [
+        "Branch: develop Abrev. Hash: 70508ebaf5 Date: Fri Jul 10 19:05:22 2026 +0200",
+        "Version: %s"
+      ]
+    },
+    {
+      "path": "/usr/local/lib/librfsimulator.so",
+      "exists": true,
+      "sha256": "ad7bde76398e777088846e786defbc8378186531bd61dde647d8299a85496230",
+      "size": 1290760,
+      "markers": {
+        "trigger_n2_ho": false,
+        "trigger_f1_ho": false,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": false,
+        "reconfigurationWithSync": false,
+        "serveraddr": true,
+        "serverport": true
+      },
+      "revision_candidates": [],
+      "version_context": []
+    },
+    {
+      "path": "/usr/local/lib/libtelnetsrv.so",
+      "exists": true,
+      "sha256": "9ad2071b8661179f4355a42f16f9022dfd3ee7b7efc62d5ea4665a40f1575402",
+      "size": 782744,
+      "markers": {
+        "trigger_n2_ho": false,
+        "trigger_f1_ho": false,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": false,
+        "reconfigurationWithSync": false,
+        "serveraddr": false,
+        "serverport": false
+      },
+      "revision_candidates": [],
+      "version_context": [
+        "Branch: develop Abrev. Hash: 70508ebaf5 Date: Fri Jul 10 19:05:22 2026 +0200",
+        "   Main executable build version: \"%s\"",
+        "       Shared library build version: \"%s\""
+      ]
+    },
+    {
+      "path": "/usr/local/lib/libtelnetsrv_ciUE.so",
+      "exists": true,
+      "sha256": "0fdf0db8c01ae3e795e7f285c9ab6fd42c3585c84525a551e299536813c81cdf",
+      "size": 37491160,
+      "markers": {
+        "trigger_n2_ho": false,
+        "trigger_f1_ho": false,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": true,
+        "reconfigurationWithSync": true,
+        "serveraddr": false,
+        "serverport": false
+      },
+      "revision_candidates": [],
+      "version_context": []
+    }
+  ],
+  "entrypoint": {
+    "sha256": "b33ba4d2ff3116b1eb3ff4b2c3cec85602a1bc17373f98eb759417e055e03afa",
+    "relevant_lines": [
+      "CONFIGFILE=$PREFIX/etc/nr-ue.conf",
+      "if [[ -v USE_ADDITIONAL_OPTIONS ]]; then",
+      "    echo \"Additional option(s): ${USE_ADDITIONAL_OPTIONS}\"",
+      "    for word in ${USE_ADDITIONAL_OPTIONS}; do",
+      "    exec \"${new_args[@]}\"",
+      "    exec \"${new_args[@]}\""
+    ]
+  },
+  "source_directories": {
+    "/oai-ran": false,
+    "/opt/oai-src": false
+  }
+}

@@ -1,0 +1,3 @@
+Name:      docker.io/oaisoftwarealliance/oai-upf:v2.0.0
+MediaType: application/vnd.docker.distribution.manifest.v2+json
+Digest:    sha256:ed69524b00b09d141a06ce985cfb0dfd3c0d725b637dddc64c8b7a72a67c7efb

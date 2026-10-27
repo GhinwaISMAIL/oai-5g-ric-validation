@@ -1,0 +1,3 @@
+Name:      docker.io/oaisoftwarealliance/oai-smf:v2.0.0
+MediaType: application/vnd.docker.distribution.manifest.v2+json
+Digest:    sha256:f725ca008dbb21d37d250f48e7975f06e776c4a7d568b8be8c0c17d5c0bae8a7

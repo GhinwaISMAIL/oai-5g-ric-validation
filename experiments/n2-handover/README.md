@@ -83,20 +83,22 @@ explicit departures for the initial interoperability test:
 
 These choices follow the upstream N2 RFsim example where applicable, adapted to
 this project's PLMN and topology. The reference is OAI revision
-`cfee4c20b45ac1cf6d455d3f01bb3e00200438b0`, whose handover tutorial blob is
-`026f859c1247eb6e7df9747c963fc877f92596fb`:
-[handover tutorial](https://github.com/OPENAIRINTERFACE/openairinterface5g/blob/cfee4c20b45ac1cf6d455d3f01bb3e00200438b0/doc/handover-tutorial.md).
+`70508ebaf52f2aae420566d380c6537f2efb9f0c`, whose handover tutorial blob is
+`a92aa2350da3e5441d13c56eedb5ccbad864cb1e`:
+[handover tutorial](https://github.com/OPENAIRINTERFACE/openairinterface5g/blob/70508ebaf52f2aae420566d380c6537f2efb9f0c/doc/handover-tutorial.md).
 This is a documentation reference, not a claim that the custom images were built
 from that revision. The OAI software UE example uses manual triggers; automatic
 measurement-driven mobility and RIC-driven control are later milestones.
 
 ## Compatibility checks before deployment
 
-The example topology records existing radio image tags as candidates, not verified
-artifacts. Record actual image IDs, registry digests, source revisions, build flags
-and local patches. Prefer replacing candidate tags in a private experiment copy
-of `topology.json` with verified digest references, then regenerate files.
-Do not relabel unknown image provenance as the upstream reference revision.
+The example topology now pins the inspected radio artifacts by registry digest.
+Both binaries report revision `70508ebaf5`; the gNB CI library includes the N2
+trigger marker and the RFsim libraries match byte for byte. See
+[COMPATIBILITY.md](COMPATIBILITY.md) for the measured evidence and limitations.
+These are static/help checks, not an operational handover certification. Record
+running image identities, source/build metadata and local patches during the
+reservation. Do not interpret an embedded version as proof of an unmodified tree.
 
 Confirm all of the following on the selected builds before the complete test:
 

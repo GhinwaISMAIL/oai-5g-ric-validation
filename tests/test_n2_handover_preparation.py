@@ -102,3 +102,21 @@ def test_preparation_never_runs_external_programs_or_overwrites(tmp_path, monkey
     with pytest.raises(ValueError, match='already exists'):
         MODULE.generate(topology(), output)
     assert (output / 'manifest.json').read_bytes() == snapshot
+
+
+def test_default_candidates_match_preserved_inspection_evidence():
+    evidence = ROOT / 'experiments/n2-handover/evidence/2026-10-27'
+    assessment = json.loads((evidence / 'assessment.json').read_text())
+    inputs = topology()
+    for role in ('gnb', 'ue'):
+        assert inputs[role + '_image'] == assessment['images'][role]
+        assert '@sha256:' in inputs[role + '_image']
+    assert MODULE.REFERENCE == assessment['source_revision_reported_by_binaries']
+    for name, digest in assessment['evidence_files_sha256'].items():
+        assert hashlib.sha256((evidence / name).read_bytes()).hexdigest() == digest
+    gnb = json.loads((evidence / 'gnb.static.json').read_text())
+    ue = json.loads((evidence / 'ue.static.json').read_text())
+    def rfsim_hash(data):
+        return next(item['sha256'] for item in data['files'] if item['path'].endswith('/librfsimulator.so'))
+    assert rfsim_hash(gnb) == rfsim_hash(ue)
+    assert assessment['status'] == 'radio_candidate_pair_identified_end_to_end_unverified'

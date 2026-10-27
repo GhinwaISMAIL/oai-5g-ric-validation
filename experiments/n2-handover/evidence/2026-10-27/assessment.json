@@ -1,0 +1,73 @@
+{
+  "assessed_date": "2026-10-27",
+  "status": "radio_candidate_pair_identified_end_to_end_unverified",
+  "source_revision_reported_by_binaries": "70508ebaf52f2aae420566d380c6537f2efb9f0c",
+  "embedded_revision_prefix": "70508ebaf5",
+  "reference_tutorial_git_blob": "a92aa2350da3e5441d13c56eedb5ccbad864cb1e",
+  "reference_tutorial_sha256": "50bc353119b88a4180ead4c57f2b10012c5930978d879560aee7fe4601553405",
+  "images": {
+    "gnb": "ghinwa555/oai-gnb-e2-chan@sha256:1bc3c341b498fdc2096721bd0b86f5bdd3ca985a930617163c611db5a9bc5501",
+    "ue": "ghinwa555/oai-nr-ue-chan@sha256:f00af9714f0e953c79d8e4def6b71d15d9af2c504bca1e0a8db2edbb59d6fb60"
+  },
+  "core_candidates": {
+    "amf": {
+      "tag": "oaisoftwarealliance/oai-amf:v2.0.0",
+      "immutable_reference": "oaisoftwarealliance/oai-amf@sha256:e481c6c30f9b2e7763697f9ed1235bbb326aa9ab28ea48d2504e96181663b76e",
+      "validation": "registry_identity_only_no_core_container_run"
+    },
+    "smf": {
+      "tag": "oaisoftwarealliance/oai-smf:v2.0.0",
+      "immutable_reference": "oaisoftwarealliance/oai-smf@sha256:f725ca008dbb21d37d250f48e7975f06e776c4a7d568b8be8c0c17d5c0bae8a7",
+      "validation": "registry_identity_only_no_core_container_run"
+    },
+    "upf": {
+      "tag": "oaisoftwarealliance/oai-upf:v2.0.0",
+      "immutable_reference": "oaisoftwarealliance/oai-upf@sha256:ed69524b00b09d141a06ce985cfb0dfd3c0d725b637dddc64c8b7a72a67c7efb",
+      "validation": "registry_identity_only_no_core_container_run"
+    }
+  },
+  "findings": {
+    "radio_architecture": "linux/amd64",
+    "radio_base_distribution": "Ubuntu 24.04 (registry label/history)",
+    "gnb_n2_trigger_marker": true,
+    "gnb_ci_library_present": true,
+    "ue_mobility_reconfiguration_marker": true,
+    "rfsim_library_sha256_equal": true,
+    "main_executable_dependencies_resolved": true,
+    "gnb_help_exit_code": 255,
+    "ue_help_exit_code": 0,
+    "help_exits_interpretation": "gNB emitted help and config_cmdline exit_fun; do not require a zero help exit",
+    "amf_v2_0_0_source_n2_handlers": "Handover Required, Request Ack, Notify; source context release",
+    "smf_v2_0_0_source_n2_handlers": "HANDOVER_REQUIRED, HANDOVER_REQ_ACK, PREPARING/PREPARED/COMPLETED",
+    "amf_v2_1_0_release_notes": "Contains an N2 handover fix; no upgrade selected without a failing live case"
+  },
+  "provenance_limitations": [
+    "Embedded version is self-reported, not proof of an unmodified source tree",
+    "Build attestations identify shared ran-build and ran-base artifacts but not a source commit or patch set",
+    "Registry tags inspected today may differ from images running on an existing reservation"
+  ],
+  "deferred_checks": [
+    "Native Linux execution with actual radio configuration and core",
+    "Independent attachment to both cells and cross-host RFsim operation",
+    "Full forward/reverse N2 handover and PDU-session/traffic continuity"
+  ],
+  "source_evidence": {
+    "amf_v2_0_0_n2_cpp_sha256": "e632391bfe6d541bc88807a453a206259c25a1df47f78e7c8654d94f3c735ad2",
+    "smf_v2_0_0_context_cpp_sha256": "bf69933ee4d081ffe69d3c7cb60310cdc28b4db5fdb442a75b5f2679bf1d3a45"
+  },
+  "evidence_files_sha256": {
+    "amf.registry.txt": "120a141e1b9e85869edb570df494a249017b95705c0158cf47283a633aaa49ef",
+    "gnb.help.json": "a299b120959513b15bbf93fd519cd098b938d9a1324782b7410379ea94f0f315",
+    "gnb.index.json": "25a77d04f2bcd4f2c650bf21971f1eac864e846c5b0150a8ad26132ca65542c5",
+    "gnb.provenance.json": "66b3b28dfc22b60cd7c102cfb783fbafc5be4a6768cc0e1eb0428bd0736f6bda",
+    "gnb.static.json": "ca9462be66c92d1bdda0c67c34404bd8da11b870294ead833030d8a9d8cafe4f",
+    "help-probe.py": "b17ab0c48ac03ce4186cf7231e0cf5d478fc0b21dff08507ed0dfe48d26a743d",
+    "inspect-radio.py": "59f38a42b0eabc97c291248e4f5ba9768336b64075038824b17e7af94192dcfb",
+    "smf.registry.txt": "e51be5d4c75da81e5451f38e2b5edccf9f4e55afcbde57f1f09602cc45aba70d",
+    "ue.help.json": "3205e1149985e3c40b1eefab540ae469d45d093121bae9d2c0f7b7b6b3794bc7",
+    "ue.index.json": "560942c84fcbd2302d5997502b594f4b1c816e0f8e0fb2b5e80d3c1c47d73a29",
+    "ue.provenance.json": "b6ce3631417081167468f7602d5403786e2c6c6b763b0a030895f9c1dabfa902",
+    "ue.static.json": "6354709df910f7118a4e2fc6d718a6a5fc5d25481ed62313b25132c9dda5ea5b",
+    "upf.registry.txt": "8f1ac2cab410848a44c01ac74bf3a0fc92920e05110f58dccc5385938a528c30"
+  }
+}

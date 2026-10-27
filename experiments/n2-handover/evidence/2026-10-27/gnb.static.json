@@ -1,0 +1,108 @@
+{
+  "role": "gnb",
+  "inspection": "static_only_no_radio_started",
+  "files": [
+    {
+      "path": "/opt/oai-gnb/bin/nr-softmodem",
+      "exists": true,
+      "sha256": "3405c6bc464928483be45c0f5761559ec82938d3db8c854f70b8e6a46e37a532",
+      "size": 118382656,
+      "markers": {
+        "trigger_n2_ho": true,
+        "trigger_f1_ho": true,
+        "HandoverRequired": true,
+        "HandoverRequest": true,
+        "HandoverNotify": true,
+        "neighbour_list": true,
+        "RRCReconfiguration": true,
+        "reconfigurationWithSync": true,
+        "serveraddr": false,
+        "serverport": false
+      },
+      "revision_candidates": [],
+      "version_context": [
+        "Branch: develop Abrev. Hash: 70508ebaf5 Date: Fri Jul 10 19:05:22 2026 +0200",
+        "Version: %s"
+      ]
+    },
+    {
+      "path": "/usr/local/lib/librfsimulator.so",
+      "exists": true,
+      "sha256": "ad7bde76398e777088846e786defbc8378186531bd61dde647d8299a85496230",
+      "size": 1290760,
+      "markers": {
+        "trigger_n2_ho": false,
+        "trigger_f1_ho": false,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": false,
+        "reconfigurationWithSync": false,
+        "serveraddr": true,
+        "serverport": true
+      },
+      "revision_candidates": [],
+      "version_context": []
+    },
+    {
+      "path": "/usr/local/lib/libtelnetsrv.so",
+      "exists": true,
+      "sha256": "9ad2071b8661179f4355a42f16f9022dfd3ee7b7efc62d5ea4665a40f1575402",
+      "size": 782744,
+      "markers": {
+        "trigger_n2_ho": false,
+        "trigger_f1_ho": false,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": false,
+        "reconfigurationWithSync": false,
+        "serveraddr": false,
+        "serverport": false
+      },
+      "revision_candidates": [],
+      "version_context": [
+        "Branch: develop Abrev. Hash: 70508ebaf5 Date: Fri Jul 10 19:05:22 2026 +0200",
+        "   Main executable build version: \"%s\"",
+        "       Shared library build version: \"%s\""
+      ]
+    },
+    {
+      "path": "/usr/local/lib/libtelnetsrv_ci.so",
+      "exists": true,
+      "sha256": "b7e56e6ef0b0d92894761e69a8f844ffca0582c9d898c6dd47a38283ced9ed9e",
+      "size": 1090848,
+      "markers": {
+        "trigger_n2_ho": true,
+        "trigger_f1_ho": true,
+        "HandoverRequired": false,
+        "HandoverRequest": false,
+        "HandoverNotify": false,
+        "neighbour_list": false,
+        "RRCReconfiguration": false,
+        "reconfigurationWithSync": true,
+        "serveraddr": false,
+        "serverport": false
+      },
+      "revision_candidates": [],
+      "version_context": []
+    }
+  ],
+  "entrypoint": {
+    "sha256": "d4451e9f1fd988e338acba8a2aa0e39fce31ceb93c94449435ced556988f7d35",
+    "relevant_lines": [
+      "CONFIGFILE=$PREFIX/etc/gnb.conf",
+      "if [[ -v USE_ADDITIONAL_OPTIONS ]]; then",
+      "    echo \"Additional option(s): ${USE_ADDITIONAL_OPTIONS}\"",
+      "    for word in ${USE_ADDITIONAL_OPTIONS}; do",
+      "    exec \"${new_args[@]}\"",
+      "    exec \"${new_args[@]}\""
+    ]
+  },
+  "source_directories": {
+    "/oai-ran": false,
+    "/opt/oai-src": false
+  }
+}

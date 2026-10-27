@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = 'cfee4c20b45ac1cf6d455d3f01bb3e00200438b0'
+REFERENCE = '70508ebaf52f2aae420566d380c6537f2efb9f0c'
 REQUIRED = {'core_lan_ip', 'source_lan_ip', 'target_lan_ip', 'amf_ip', 'imsi', 'gnb_image', 'ue_image'}
 CELLS = (
     {'role': 'source', 'index': 1, 'gnb_id': 3584, 'cell_id': 12345678,

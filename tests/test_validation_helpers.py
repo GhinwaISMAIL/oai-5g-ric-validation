@@ -40,7 +40,7 @@ esac
                                MGEN_HOST_LOG_DIR=str(directory))
                     subprocess.run(['bash', str(ROOT / f'bin/mgen-{name}.sh'), *args],
                                    env=env, capture_output=True, text=True, check=True)
-                    self.assertIn("timeout '1500'", calls.read_text())
+                    self.assertIn("mgen_observe rx 1500", calls.read_text())
                     env['MGEN_DRAIN_SECONDS'] = '-1'
                     result = subprocess.run(['bash', str(ROOT / f'bin/mgen-{name}.sh'), *args],
                                             env=env, capture_output=True, text=True)

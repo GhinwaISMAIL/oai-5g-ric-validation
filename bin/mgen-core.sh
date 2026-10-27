@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
+source "$(dirname "${BASH_SOURCE[0]}")/mgen-lifecycle.sh"
+
 DN_C="${MGEN_DN_CONTAINER:-ric5g-oai-ext-dn}"
 UPF_C="${MGEN_UPF_CONTAINER:-ric5g-oai-upf}"
 LOG_DIR="${MGEN_CONTAINER_LOG_DIR:-/logs/mgen}"
@@ -11,6 +13,7 @@ LOG_DIR="${MGEN_CONTAINER_LOG_DIR:-/logs/mgen}"
 usage() {
     cat <<'EOF'
 Usage:
+  sudo bash bin/mgen-core.sh receiver-status RUN_ID CELL UE
   sudo bash bin/mgen-core.sh check
   sudo bash bin/mgen-core.sh listen-ul RUN_ID CELL UE PORT DURATION
   sudo bash bin/mgen-core.sh count-ul RUN_ID CELL UE
@@ -90,9 +93,14 @@ listen-ul)
     LOG="${BASE}.log"
     docker exec "$DN_C" bash -lc \
         "mkdir -p '$LOG_DIR'; printf '0.0 LISTEN UDP %s\\n' '$PORT' > '$CFG'; : > '$LOG'"
-    docker exec -d "$DN_C" bash -lc \
-        "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '$CFG' output '$LOG'"
+    mgen_launch "$DN_C" rx "$((DURATION + DRAIN_SECONDS))" "$CFG" "$LOG"
     echo "OK: uplink receiver armed on UDP $PORT; log=$LOG"
+    ;;
+
+receiver-status)
+    [ "$#" -eq 4 ] || { usage; exit 2; }
+    require_run_id "$2"; require_uint CELL "$3"; require_uint UE "$4"
+    mgen_receiver_check "$DN_C" "$(ul_base "$2" "$3" "$4").log"
     ;;
 
 count-ul)
@@ -126,9 +134,8 @@ send-dl)
     FLOW_ID=$((CELL * 100 + UE))
     docker exec "$DN_C" bash -lc \
         "mkdir -p '$LOG_DIR'; printf '0.0 ON %s UDP DST %s/%s PERIODIC [%s %s]\\n%s.0 OFF %s\\n' \
-         '$FLOW_ID' '$UE_IP' '$PORT' '$RATE' '$SIZE' '$DURATION' '$FLOW_ID' > '$CFG'; \
-         timeout '$((DURATION + 5))' /usr/bin/mgen input '$CFG' output '$LOG'; \
-         rc=\$?; [ \"\$rc\" -eq 0 ] || [ \"\$rc\" -eq 124 ]"
+         '$FLOW_ID' '$UE_IP' '$PORT' '$RATE' '$SIZE' '$DURATION' '$FLOW_ID' > '$CFG'"
+    mgen_launch "$DN_C" tx "$((DURATION + 5))" "$CFG" "$LOG"
     echo "OK: downlink sender completed for cell${CELL}/UE${UE}; log=$LOG"
     ;;
 
@@ -144,13 +151,10 @@ run-script)
     LOG="$LOG_DIR/${SCRIPT%.mgn}.log"
     docker exec "$DN_C" test -f "$CFG" || die "$DN_C is missing $CFG"
     if [ "$MODE" = rx ]; then
-        docker exec -d "$DN_C" bash -lc \
-            "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '$CFG' output '$LOG'"
+        mgen_launch "$DN_C" rx "$((DURATION + DRAIN_SECONDS))" "$CFG" "$LOG"
         echo "OK: receiver armed from $SCRIPT; log=$LOG"
     else
-        docker exec "$DN_C" bash -lc \
-            "timeout '$((DURATION + 15))' /usr/bin/mgen txlog input '$CFG' output '$LOG'; \
-             rc=\$?; [ \"\$rc\" -eq 0 ] || [ \"\$rc\" -eq 124 ]"
+        mgen_launch "$DN_C" tx "$((DURATION + 15))" "$CFG" "$LOG"
         echo "OK: sender completed from $SCRIPT; log=$LOG"
     fi
     ;;

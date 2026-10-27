@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
+source "$(dirname "${BASH_SOURCE[0]}")/mgen-lifecycle.sh"
+
 DN_IP="${MGEN_DN_IP:-192.168.72.135}"
 DN_SUBNET="${MGEN_DN_SUBNET:-192.168.72.128/26}"
 LOG_DIR_HOST="${MGEN_HOST_LOG_DIR:-/local/logs/mgen}"
@@ -12,6 +14,7 @@ LOG_DIR_CONTAINER="${MGEN_CONTAINER_LOG_DIR:-/logs/mgen}"
 usage() {
     cat <<'EOF'
 Usage:
+  sudo bash bin/mgen-cell.sh receiver-status RUN_ID CELL UE
   sudo bash bin/mgen-cell.sh check CELL UES_PER_CELL [UE]
   sudo bash bin/mgen-cell.sh send-ul RUN_ID CELL UE PORT RATE SIZE DURATION
   sudo bash bin/mgen-cell.sh listen-dl RUN_ID CELL UE PORT DURATION
@@ -116,9 +119,8 @@ send-ul)
     docker exec "$C" bash -lc \
         "mkdir -p '$LOG_DIR_CONTAINER'; \
          printf '0.0 ON %s UDP DST %s/%s PERIODIC [%s %s]\\n%s.0 OFF %s\\n' \
-         '$FLOW_ID' '$DN_IP' '$PORT' '$RATE' '$SIZE' '$DURATION' '$FLOW_ID' > '${BASE}.mgn'; \
-         timeout '$((DURATION + 5))' /usr/bin/mgen input '${BASE}.mgn' output '${BASE}.log'; \
-         rc=\$?; [ \"\$rc\" -eq 0 ] || [ \"\$rc\" -eq 124 ]"
+         '$FLOW_ID' '$DN_IP' '$PORT' '$RATE' '$SIZE' '$DURATION' '$FLOW_ID' > '${BASE}.mgn'"
+    mgen_launch "$C" tx "$((DURATION + 5))" "${BASE}.mgn" "${BASE}.log"
     TX1=$(docker exec "$C" cat /sys/class/net/oaitun_ue1/statistics/tx_packets)
     echo "UE_IP=$IP TX_DELTA=$((TX1 - TX0))"
     ;;
@@ -138,9 +140,14 @@ listen-dl)
     printf '%s\n' "$RX0" > "$LOG_DIR_HOST/$RUN_ID-dl-cell${CELL}-ue${UE}.rx0"
     docker exec "$C" bash -lc \
         "mkdir -p '$LOG_DIR_CONTAINER'; printf '0.0 LISTEN UDP %s\\n' '$PORT' > '${BASE}.mgn'; : > '${BASE}.log'"
-    docker exec -d "$C" bash -lc \
-        "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '${BASE}.mgn' output '${BASE}.log'"
+    mgen_launch "$C" rx "$((DURATION + DRAIN_SECONDS))" "${BASE}.mgn" "${BASE}.log"
     echo "UE_IP=$IP"
+    ;;
+
+receiver-status)
+    [ "$#" -eq 4 ] || { usage; exit 2; }
+    require_run_id "$2"; require_uint CELL "$3"; require_uint UE "$4"
+    mgen_receiver_check "$(ue_container "$3" "$4")" "$LOG_DIR_CONTAINER/$2-dl-cell$3-ue$4-rx.log"
     ;;
 
 count-dl)
@@ -177,14 +184,11 @@ run-script)
     if [ "$MODE" = rx ]; then
         RX0=$(docker exec "$C" cat /sys/class/net/oaitun_ue1/statistics/rx_packets)
         printf '%s\n' "$RX0" > "$LOG_DIR_HOST/$RUN_ID-cell${CELL}-ue${UE}.rx0"
-        docker exec -d "$C" bash -lc \
-            "timeout '$((DURATION + DRAIN_SECONDS))' /usr/bin/mgen input '$CFG' output '$LOG'"
+        mgen_launch "$C" rx "$((DURATION + DRAIN_SECONDS))" "$CFG" "$LOG"
         echo "UE_IP=$IP RX0=$RX0"
     else
         TX0=$(docker exec "$C" cat /sys/class/net/oaitun_ue1/statistics/tx_packets)
-        docker exec "$C" bash -lc \
-            "timeout '$((DURATION + 15))' /usr/bin/mgen txlog input '$CFG' output '$LOG'; \
-             rc=\$?; [ \"\$rc\" -eq 0 ] || [ \"\$rc\" -eq 124 ]"
+        mgen_launch "$C" tx "$((DURATION + 15))" "$CFG" "$LOG"
         TX1=$(docker exec "$C" cat /sys/class/net/oaitun_ue1/statistics/tx_packets)
         echo "UE_IP=$IP TX_DELTA=$((TX1 - TX0))"
     fi

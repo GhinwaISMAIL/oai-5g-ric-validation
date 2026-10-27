@@ -72,7 +72,9 @@ and make SQLite fail inside `insert_db`. The normal RIC process log remains at
 `/local/logs/nearRT-RIC.log`, and bounded xApp logs remain under `/local/logs`.
 
 `BUILD.md` records the known build constraints and missing image provenance.
-See [VALIDATION.md](VALIDATION.md) for receiver timing and controlled experiments.
+See [VALIDATION.md](VALIDATION.md) for explicit campaign observation policies,
+process lifecycle checks, packet reconciliation, resource time series, and
+controlled experiments.
 
 ## Instantiating
 
